@@ -1,11 +1,12 @@
-import './App.css'
+import './index.css'
+import CanvasEditor from './components/CanvasEditor'
 
 function App() {
 
   return (
-    <>
-     <h1>Hello World foobar</h1>
-    </>
+    <div className="flex justify-center items-center min-h-screen bg-gray-200">
+      <CanvasEditor />
+    </div>
   )
 }
 
