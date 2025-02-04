@@ -1,8 +1,15 @@
 import { useEffect, useRef } from "react";
-import * as fabric from 'fabric'
-import html2canvas from "html2canvas";
+import * as fabric from "fabric";
 import { Modal, useModal } from "../hooks/useModal";
-import { TextboxActions } from "./TextboxActions";
+import logo from "../assets/logo.svg";
+import reset from "../assets/reset.svg";
+import text from "../assets/text.svg";
+import img from "../assets/img.svg";
+import alert from "../assets/alert.svg";
+import background from "../assets/background.svg";
+import EditorActionButton from "./EditorActionButton";
+import CanvasContainer from "./CanvasContainer";
+import ExportButton from "./ExportButton";
 
 const CanvasEditor = () => {
   const canvasRef = useRef<fabric.Canvas | null>(null);
@@ -14,17 +21,8 @@ const CanvasEditor = () => {
     const canvas = new fabric.Canvas("canvas", {
       width: 600,
       height: 800,
-      backgroundColor: "#fff",
+      backgroundColor: "#9B9B9B",
     });
-
-
-    canvas.on("mouse:down", (event) => {
-      const target = event.target as any;
-      if (target && target.handleColorChange) {
-        target.handleColorChange(event);
-      }
-    });
-
 
     canvasRef.current = canvas;
     return () => {
@@ -32,19 +30,17 @@ const CanvasEditor = () => {
     };
   }, []);
 
-  
-
   const addText = () => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
 
-    const text = new TextboxActions("Type your text here", {
+    const text = new fabric.Textbox("Type your text here", {
       fontSize: 24,
       fill: "#000",
       editable: true,
       left: 200,
       top: 200,
-      width: 200
+      width: 200,
     });
 
     canvas.add(text);
@@ -111,55 +107,67 @@ const CanvasEditor = () => {
   const resetCanvas = () => {
     if (!canvasRef.current) return;
     canvasRef.current.clear();
-    close()
-  };
-
-  const exportToPNG = async () => {
-    if (!canvasContainer.current) return;
-    const canvasElement = canvasContainer.current;
-    const canvasImage = await html2canvas(canvasElement, {
-      width: 1080,
-      height: 1350,
-      scale: 1,
-    });
-
-    const link = document.createElement("a");
-    link.href = canvasImage.toDataURL("image/png");
-    link.download = "canvas-export.png";
-    link.click();
+    close();
   };
 
   return (
     <>
-      <Modal
-        ref={modalRef}
-        onCancel={close}
-        onOk={resetCanvas}>
-        <h1>Czy na pewno chcesz zresetować aktualny postęp?</h1>
-      </Modal>
-      <div className="flex gap-4 p-4">
-        <div ref={canvasContainer} className="border shadow-lg w-[600px] h-[800px] bg-white">
-          <canvas id="canvas" className="w-full h-full" />
+      <Modal ref={modalRef} onCancel={close} onOk={resetCanvas}>
+        <div className="flex flex-col items-center">
+          <div className="text-red-500 text-6xl mb-4">
+            <img src={alert} alt="alert" className="w-16 h-16" />
+          </div>
+
+          <h1 className="text-xl font-bold text-gray-800 mb-2">WARNING</h1>
+
+          <p className="text-center text-gray-600">
+            You’re about to reset the whole process. Are you sure you want to do
+            it?
+          </p>
         </div>
-        <div className="flex flex-col gap-4 p-4 border bg-gray-100 w-80">
-          <button onClick={addText} className="bg-blue-500 text-white p-2 rounded">Dodaj Tekst</button>
+      </Modal>
+      <div className="flex gap-4 p-4 ">
+        <CanvasContainer canvasRef={canvasRef} ref={canvasContainer} />
+        <div className="flex flex-col gap-4 p-4 w-80">
+          <div className="flex justify-between items-center border-b pb-2 mb-4">
+            <div className="flex items-center gap-2">
+              <img src={logo} alt="logo" className="w-8 h-8" />
+              <h2 className="text-2xl font-bold text-gray-700">CanvasEditor</h2>
+            </div>
+            <button
+              onClick={open}
+              className="flex items-center gap-2 text-red-500 font-semibold group"
+            >
+              <span className="group-hover:underline">Reset</span>
+              <img
+                src={reset}
+                alt="reset"
+                className="w-4 h-4 text-red-500 group-hover:underline"
+              />
+            </button>
+          </div>
 
-          <label className="bg-gray-300 p-2 rounded cursor-pointer text-center">
-            Dodaj Tło
-            <input type="file" accept="image/*" onChange={addBackgroundImage} className="hidden" />
-          </label>
+          <div className="mb-4 bg-gray-100 w-full p-3 rounded-md">
+            <h3 className="text-lg font-semibold ">Add content</h3>
+          </div>
 
-          <label className="bg-gray-300 p-2 rounded cursor-pointer text-center">
-            Dodaj Obrazek
-            <input type="file" accept="image/*" onChange={addImage} className="hidden" />
-          </label>
-          <button
-            onClick={open}
-            className="bg-red-500 text-white p-2 rounded"
-          >
-            Resetuj
-          </button>
-          <button onClick={exportToPNG} className="bg-purple-500 text-white p-2 rounded">Eksportuj do PNG</button>
+          <div className="grid grid-cols-2 gap-4">
+            <EditorActionButton onClick={addText} icon={text} label="Text" />
+            <EditorActionButton
+              onFileChange={addImage}
+              icon={img}
+              label="Image"
+            />
+            <EditorActionButton
+              onFileChange={addBackgroundImage}
+              icon={background}
+              label="Background"
+            />
+          </div>
+
+          <div className="border-t mt-4 pt-4 flex justify-end">
+            <ExportButton canvasRef={canvasRef} />
+          </div>
         </div>
       </div>
     </>

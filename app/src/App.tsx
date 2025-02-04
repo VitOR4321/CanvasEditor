@@ -1,13 +1,12 @@
-import './index.css'
-import CanvasEditor from './components/CanvasEditor'
+import "./index.css";
+import CanvasEditor from "./components/CanvasEditor";
 
 function App() {
-
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-200">
+    <div className="flex justify-center items-center min-h-screen">
       <CanvasEditor />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
