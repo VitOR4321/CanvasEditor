@@ -2,12 +2,13 @@ import { useEffect, useRef } from "react";
 import * as fabric from 'fabric'
 import html2canvas from "html2canvas";
 import { Modal, useModal } from "../hooks/useModal";
+import { TextboxActions } from "./TextboxActions";
 
 const CanvasEditor = () => {
   const canvasRef = useRef<fabric.Canvas | null>(null);
   const canvasContainer = useRef<HTMLDivElement | null>(null);
 
-  const [open, close, ref] = useModal()
+  const [modalRef, open, close] = useModal();
 
   useEffect(() => {
     const canvas = new fabric.Canvas("canvas", {
@@ -16,24 +17,37 @@ const CanvasEditor = () => {
       backgroundColor: "#fff",
     });
 
+
+    canvas.on("mouse:down", (event) => {
+      const target = event.target as any;
+      if (target && target.handleColorChange) {
+        target.handleColorChange(event);
+      }
+    });
+
+
     canvasRef.current = canvas;
     return () => {
       canvas.dispose();
     };
   }, []);
 
+  
+
   const addText = () => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
 
-    const text = new fabric.Textbox("Wpisz coś", {
+    const text = new TextboxActions("Type your text here", {
       fontSize: 24,
       fill: "#000",
       editable: true,
+      left: 200,
+      top: 200,
+      width: 200
     });
 
     canvas.add(text);
-    canvas.centerObject(text);
     canvas.setActiveObject(text);
   };
 
@@ -118,7 +132,7 @@ const CanvasEditor = () => {
   return (
     <>
       <Modal
-        ref={ref}
+        ref={modalRef}
         onCancel={close}
         onOk={resetCanvas}>
         <h1>Czy na pewno chcesz zresetować aktualny postęp?</h1>
@@ -140,7 +154,7 @@ const CanvasEditor = () => {
             <input type="file" accept="image/*" onChange={addImage} className="hidden" />
           </label>
           <button
-            onClick={() => open}
+            onClick={open}
             className="bg-red-500 text-white p-2 rounded"
           >
             Resetuj
@@ -148,10 +162,7 @@ const CanvasEditor = () => {
           <button onClick={exportToPNG} className="bg-purple-500 text-white p-2 rounded">Eksportuj do PNG</button>
         </div>
       </div>
-
-
     </>
-
   );
 };
 
