@@ -17,7 +17,6 @@ export default function ExportButton(props: Props) {
 
     const exportCtx = exportCanvas.getContext("2d");
     if (!exportCtx) {
-      console.error("Failed to get 2D context.");
       return;
     }
 
@@ -55,7 +54,6 @@ export default function ExportButton(props: Props) {
       ))();
 
     if (!blob) {
-      console.error("Failed to generate PNG.");
       return;
     }
 

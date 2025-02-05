@@ -22,10 +22,7 @@ const CanvasContainer = forwardRef<HTMLDivElement, Props>(
           backgroundPosition: "center",
         }}
       >
-        <canvas
-          id="canvas"
-          className={`w-full h-full ${hasElements ? "bg-[#9B9B9B]" : ""}`}
-        />
+        <canvas id="canvas" className={`w-full h-full`} />
       </div>
     );
   }
